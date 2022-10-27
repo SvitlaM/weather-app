@@ -1,0 +1,133 @@
+let weather = {
+  paris: {
+    temp: 19.7,
+    humidity: 80,
+  },
+  tokyo: {
+    temp: 17.3,
+    humidity: 50,
+  },
+  lisbon: {
+    temp: 30.2,
+    humidity: 20,
+  },
+  "san francisco": {
+    temp: 20.9,
+    humidity: 100,
+  },
+  oslo: {
+    temp: -5,
+    humidity: 20,
+  },
+};
+
+// write your code here
+// let city = prompt("Enter a city!");
+// city = city.toLowerCase();
+// if (weather[city] !== undefined) {
+//   let temp = weather[city].temp;
+//   let humidity = weather[city].humidity;
+//   let tempC = Math.round(temp);
+//   let tempF = Math.round((temp * 9) / 5 + 32);
+
+//   alert(
+//     `It is currently ${tempC}°C (${tempF}}°F) in ${city} with a humidity of ${humidity}%`
+//   );
+// } else {
+//   alert(
+//     `Sorry we don't know the weather for this city, try going to https://www.google.com/search?q=weather+${city}`
+//   );
+// }
+
+//Feature #1
+
+function formatDate(now) {
+  let hours = now.getHours();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
+  let minutes = now.getMinutes();
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+  let days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  let day = days[now.getDay()];
+  return `${day} ${hours}:${minutes}`;
+}
+
+let now = new Date();
+let currentDayTime = document.querySelector("#current-date-time");
+currentDayTime.innerHTML = formatDate(now);
+
+let city = document.querySelector("#current-city");
+let searchButton = document.querySelector("#search");
+
+function showCurrentTemperature(response) {
+  let temperature = Math.round(response.data.main.temp);
+  let h1 = document.querySelector("#current-city");
+  let h2 = document.querySelector("#current-temp");
+  h1.innerHTML = response.data.name;
+  h2.innerHTML = temperature;
+}
+
+function searchTemperature(city) {
+  console.log(city);
+  let apiKey = "a95c2c6739994ba4903e007ee817e7d1";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric`;
+  axios.get(`${apiUrl}&appid=${apiKey}`).then(showCurrentTemperature);
+}
+
+function display(event) {
+  event.preventDefault();
+  let input = document.querySelector("#form1");
+  city.innerHTML = input.value;
+  searchTemperature(input.value);
+}
+
+searchButton.addEventListener("click", display);
+
+// Bonus Feature
+// Display a fake temperature (i.e 17) in Celsius and add a link to convert it to Fahrenheit. When clicking on it, it should convert the temperature to Fahrenheit. When clicking on Celsius, it should convert it back to Celsius.
+
+// let temperature = 18;
+
+// let currentTemp = document.querySelector("#current-temp");
+// function convertToF(event) {
+//   temperature = Math.round((temperature * 9) / 5 + 32);
+//   currentTemp.innerHTML = temperature;
+//   return temperature;
+// }
+// let fahrenheitTemperature = document.querySelector(".fahrenheit-temperature");
+// fahrenheitTemperature.addEventListener("click", convertToF);
+
+// let celsiusTemperature = document.querySelector(".celsius-temperature");
+// celsiusTemperature.addEventListener("click", convertToC);
+// function convertToC(event) {
+//   temperature = Math.round((5 / 9) * (temperature - 32));
+//   currentTemp.innerHTML = temperature;
+//   return temperature;
+// }
+function indicatePosition(position) {
+  let apiKey = "a95c2c6739994ba4903e007ee817e7d1";
+  let latitude = position.coords.latitude;
+  let longitude = position.coords.longitude;
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(showCurrentTemperature);
+}
+
+function geoPosition(event) {
+  event.preventDefault();
+  navigator.geolocation.getCurrentPosition(indicatePosition);
+}
+
+let currentLocation = document.querySelector("#current-location");
+currentLocation.addEventListener("click", geoPosition);
